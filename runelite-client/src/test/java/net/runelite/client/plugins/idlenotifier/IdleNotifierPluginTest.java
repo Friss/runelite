@@ -174,6 +174,46 @@ public class IdleNotifierPluginTest
 	}
 
 	@Test
+	public void checkLevelUpAnimationNotification()
+	{
+		when(player.getAnimation()).thenReturn(AnimationID.HUMAN_WOODCUTTING_BRONZE_AXE);
+		AnimationChanged animationChanged = new AnimationChanged();
+		animationChanged.setActor(player);
+		plugin.onAnimationChanged(animationChanged);
+		plugin.onGameTick(new GameTick());
+
+		// Level up animation (should be treated as idle in checkAnimationIdle)
+		when(player.getAnimation()).thenReturn(AnimationID.LEVELUP_ANIM);
+		// onAnimationChanged is called with levelup, it should NOT reset lastAnimating
+		plugin.onAnimationChanged(animationChanged);
+
+		plugin.onGameTick(new GameTick());
+
+		verify(notifier).notify(Notification.ON, "You are now idle!");
+	}
+
+	@Test
+	public void checkLevelUpAnimation()
+	{
+		when(player.getAnimation()).thenReturn(AnimationID.HUMAN_WOODCUTTING_BRONZE_AXE);
+		AnimationChanged animationChanged = new AnimationChanged();
+		animationChanged.setActor(player);
+		plugin.onAnimationChanged(animationChanged);
+		plugin.onGameTick(new GameTick());
+
+		// Level up animation
+		when(player.getAnimation()).thenReturn(AnimationID.LEVELUP_ANIM);
+		plugin.onAnimationChanged(animationChanged);
+		plugin.onGameTick(new GameTick());
+
+		// Idle
+		when(player.getAnimation()).thenReturn(-1);
+		plugin.onAnimationChanged(animationChanged);
+		plugin.onGameTick(new GameTick());
+		verify(notifier).notify(Notification.ON, "You are now idle!");
+	}
+
+	@Test
 	public void checkAnimationLogout()
 	{
 		when(player.getAnimation()).thenReturn(AnimationID.HUMAN_WOODCUTTING_BRONZE_AXE);

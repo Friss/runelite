@@ -138,8 +138,13 @@ public class IdleNotifierPlugin extends Plugin
 			return;
 		}
 
-		int graphic = localPlayer.getGraphic();
 		int animation = localPlayer.getAnimation();
+		if (isLevelUpAnimation(animation))
+		{
+			return;
+		}
+
+		int graphic = localPlayer.getGraphic();
 		switch (animation)
 		{
 			/* Woodcutting */
@@ -988,7 +993,7 @@ public class IdleNotifierPlugin extends Plugin
 
 		final int animation = local.getAnimation();
 
-		if (animation == -1)
+		if (animation == -1 || isLevelUpAnimation(animation))
 		{
 			if (lastAnimating != null && Instant.now().compareTo(lastAnimating.plus(waitDuration)) >= 0)
 			{
@@ -1008,6 +1013,13 @@ public class IdleNotifierPlugin extends Plugin
 		}
 
 		return false;
+	}
+
+	private static boolean isLevelUpAnimation(int animation)
+	{
+		return animation == AnimationID.LEVELUP_ANIM
+			|| animation == AnimationID.LEVELUP_99_SKILL
+			|| animation == AnimationID.LEVELUP_MAX;
 	}
 
 	private boolean checkMovementIdle(Duration waitDuration, Player local)
