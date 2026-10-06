@@ -273,8 +273,15 @@ class Updater
 
 			log.info("Launching installer");
 
+			Path installerExe = tempExe.toRealPath();
+			if (!installerExe.startsWith(Paths.get(System.getProperty("java.io.tmpdir")).toRealPath()))
+			{
+				log.error("installer path is not within temp directory");
+				return;
+			}
+
 			var pb = new ProcessBuilder(
-				tempExe.toFile().getAbsolutePath(),
+				installerExe.toString(),
 				"/SILENT"
 			);
 
