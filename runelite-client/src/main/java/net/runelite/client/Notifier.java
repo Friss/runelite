@@ -69,7 +69,6 @@ import net.runelite.client.util.OSType;
 @Slf4j
 public class Notifier
 {
-	private static final String DOUBLE_QUOTE = "\"";
 	private static final Escaper SHELL_ESCAPE = Escapers.builder()
 		.addEscape('"', "'")
 		.build();
@@ -386,18 +385,13 @@ public class Notifier
 		}
 		else
 		{
-			commands.add("osascript");
-			commands.add("-e");
-
-			final String script = "display notification " + DOUBLE_QUOTE +
-				SHELL_ESCAPE.escape(message) +
-				DOUBLE_QUOTE +
-				" with title " +
-				DOUBLE_QUOTE +
-				SHELL_ESCAPE.escape(title) +
-				DOUBLE_QUOTE;
-
-			commands.add(script);
+			Collections.addAll(commands,
+				"osascript",
+				"-e", "on run argv\ndisplay notification (item 1 of argv) with title (item 2 of argv)\nend run",
+				"--",
+				message,
+				title
+			);
 		}
 
 		try
